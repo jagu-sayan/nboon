@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 04:10:42 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/26 17:13:39 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/27 18:00:00 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,10 @@ size_t			nb_strlen(const char *str)
 
 char			*nb_strdup(const char *s1)
 {
-	size_t		size;
 	char		*new;
 	char		*save;
 
-	size = nb_strlen(s1);
-	new = (char*)malloc(sizeof(*new) * (size + 1));
+	new = (char*)malloc(sizeof(*new) * (nb_strlen(s1) + 1));
 	if (new == NULL)
 		return (NULL);
 	save = new;
@@ -39,23 +37,6 @@ char			*nb_strdup(const char *s1)
 	return (save);
 }
 
-void			*nb_memcpy(void *s1, const void *s2, size_t n)
-{
-	const char	*str2;
-	char		*str1;
-	size_t		i;
-
-	i = 0;
-	str1 = (char*)s1;
-	str2 = (const char*)s2;
-	while (i < n)
-	{
-		str1[i] = str2[i];
-		i++;
-	}
-	return (s1);
-}
-
 void			*nb_memmove(void *s1, const void *s2, size_t n)
 {
 	const char	*src;
@@ -63,14 +44,54 @@ void			*nb_memmove(void *s1, const void *s2, size_t n)
 
 	dest = (char*)s1;
 	src = (const char*)s2;
-	if (s1 == s2)
-		return (s1);
 	if (s2 > s1)
-		return (nb_memcpy(dest, src, n));
-	while (n > 0)
 	{
-		dest[n - 1] = src[n - 1];
-		--n;
+		while (n--)
+			*dest++ = *src++;
+	}
+	else if (s1 != s2)
+	{
+		while (n--)
+			dest[n] = src[n];
 	}
 	return (s1);
+}
+
+static size_t	nbr_digit(int n)
+{
+	int		size;
+
+	size = 1;
+	while (n)
+	{
+		n /= 10;
+		size++;
+	}
+	return (size);
+}
+
+char			*nb_itoa(int n)
+{
+	char	*new;
+	size_t	size;
+
+	size = nbr_digit(n);
+	if ((new = malloc(size + 1)) == NULL)
+		return (NULL);
+	if (n == 0)
+		*new = '0';
+	else if (n > 0)
+	{
+		n = -n;
+		--size;
+	}
+	else
+		*new = '-';
+	new[size] = '\0';
+	while (n != 0)
+	{
+		new[--size] = n % -10 * -1 + '0';
+		n /= -10 * -1;
+	}
+	return (new);
 }

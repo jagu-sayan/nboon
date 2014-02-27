@@ -6,17 +6,15 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 00:53:03 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/27 14:48:41 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/27 20:01:20 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
-//#include "libft.h"
+#include <sys/ioctl.h>
 #include "nboon.h"
 
-
 //errno = ENOTTY;
-
 static int		execute_evt(t_nboon *s, int evt)
 {
 	int			i;
@@ -24,10 +22,10 @@ static int		execute_evt(t_nboon *s, int evt)
 		{ TAB, tab_evt },
 		{ ENTER, enter_evt },
 		{ BACKSPACE, backspace_evt },
-		{ CTRL_H, ctrl_h_evt },
+		{ CTRL_H, backspace_evt },
 		{ CTRL_T, ctrl_t_evt },
-		{ CTRL_B, ctrl_b_evt },
-		{ CTRL_F, ctrl_f_evt },
+		{ CTRL_B, move_left_evt },
+		{ CTRL_F, move_right_evt },
 		{ CTRL_P, ctrl_p_evt },
 		{ CTRL_N, ctrl_n_evt },
 		{ CTRL_U, ctrl_u_evt },
@@ -55,40 +53,56 @@ static int		execute_evt(t_nboon *s, int evt)
 
 static void		insert_char(t_nboon *l, char c)
 {
-	if (l->len < l->buflen)
+	if (l->b_len < LINE_BUF_SIZE)
 	{
-		if (l->len != l->pos)
-			nb_memmove(&l->buf[l->pos + 1], &l->buf[l->pos], l->len - l->pos);
-		l->buf[l->pos] = c;
-		l->pos++;
-		l->len++;
-		l->buf[l->len] = '\0';
+		if (l->b_len != l->b_pos)
+			nb_memmove(&l->buf[l->b_pos + 1], &l->buf[l->b_pos], l->b_len - l->b_pos);
+		l->buf[l->b_pos] = c;
+		l->b_pos++;
+		l->b_len++;
+		l->buf[l->b_len] = '\0';
 		refresh_line(l);
 	}
 }
 
-static int		line_edit(int fd, char *buf, size_t len, const char *prompt)
+static int		get_columns(void)
 {
-	t_nboon		state;
+	struct winsize		ws;
+
+	if (ioctl(1, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0)
+		return (80);
+	return (ws.ws_col);
+}
+
+static int		line_edit(int fd, char *buf, const char *prompt)
+{
+	t_nboon		line;
 	char		c;
 
-	state.fd = fd;
-	state.buf = buf;
-	state.buflen = len;
-	state.prompt = prompt;
-	state.plen = nb_strlen(prompt);
-	state.oldpos = state.pos = 0;
-	state.len = 0;
+	line.fd = fd;
+	line.buf = buf;
+	line.b_len = 0;
+	line.b_pos = 0;
+	line.prompt = prompt;
+	line.p_len = nb_strlen(prompt);
+	line.cols = get_columns();
+	line.rows = 0;
 	buf[0] = '\0';
-	write(fd, prompt, state.plen);
+	write(fd, prompt, line.p_len);
 	while (read(fd, &c, 1) > 0)
 	{
 		if (c == CTRL_D)
-			return (-1);
-		else if (c == CTRL_C)
+		{
+			if (line.b_len == 0)
+				return (-1);
+			delete_evt(&line);
+		}
+		else if (c == CTRL_C || c == ENTER)
 			return (0);
-		if (execute_evt(&state, c) == 0)
-			insert_char(&state, c);
+		else if (c == CTRL_V)
+			return (0);
+		else if (execute_evt(&line, c) == 0)
+			insert_char(&line, c);
 	}
 	return (0);
 }
@@ -100,16 +114,16 @@ static int		line_edit(int fd, char *buf, size_t len, const char *prompt)
 ** The typed string is returned as a malloc() allocated string,
 ** so the user needs to free() it.
 **/
-char			*get_line(const char *prompt)
+char			*nb_get_line(const char *prompt)
 {
-	char	buf[MAX_LINE];
+	char	buf[LINE_BUF_SIZE];
 	int		count;
 
 	count = -1;
-	if (isatty(STDIN_FILENO) && enable_raw(STDIN_FILENO) != -1)
+	if (isatty(STDIN_FILENO) && nb_enable_raw(STDIN_FILENO) != -1)
 	{
-		count = line_edit(STDIN_FILENO, buf, MAX_LINE, prompt);
-		disable_raw(STDIN_FILENO);
+		count = line_edit(STDIN_FILENO, buf, prompt);
+		nb_disable_raw(STDIN_FILENO);
 		write(1, "\n", 1);
 		if (count == -1)
 			return (NULL);

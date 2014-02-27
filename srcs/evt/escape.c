@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 05:09:17 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/27 14:52:54 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/27 19:39:54 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,46 +20,50 @@
 #define RIGHT_KEY 67
 #define LEFT_KEY 68
 
-static void		escape_extended(t_nboon *l)
+static void		change_history(void)
+{
+
+}
+
+static void		escape_extended(t_nboon *l, char evt)
 {
 	char	key[2];
 
 	read(l->fd, &key, 2);
-	if (key[0] == 126 && key[1] == 51)
+	if (evt == 51 && key[0] == DELETE)
+		delete_evt(l);
+}
+
+void			delete_evt(t_nboon *l)
+{
+	size_t		n;
+
+	n = l->b_len - l->b_pos - 1;
+	if (l->b_len > 0 && l->b_pos < l->b_len)
 	{
-		if (l->len > 0 && l->pos < l->len)
-		{
-			nb_memmove(&l->buf[l->pos], &l->buf[l->pos + 1], l->len - l->pos - 1);
-			l->len--;
-			l->buf[l->len] = '\0';
-			refresh_line(l);
-		}
+		nb_memmove(&l->buf[l->b_pos], &l->buf[l->b_pos + 1], n);
+		l->b_len--;
+		l->buf[l->b_len] = '\0';
+		refresh_line(l);
 	}
 }
 
-static void		move_left(t_nboon *l)
+void			move_left_evt(t_nboon *l)
 {
-	if (l->pos > 0)
+	if (l->b_pos > 0)
 	{
-		l->pos--;
-		write(l->fd, "\x1b[1D", nb_strlen("\x1b[1D"));
-		/* refresh_line(l); */
+		l->b_pos--;
+		refresh_line(l);
 	}
 }
 
-static void		move_right(t_nboon *l)
+void			move_right_evt(t_nboon *l)
 {
-	if (l->pos < l->len)
+	if (l->b_pos < l->b_len)
 	{
-		l->pos++;
-		write(l->fd, "\x1b[1C", nb_strlen("\x1b[1C"));
-		/* refresh_line(l); */
+		l->b_pos++;
+		refresh_line(l);
 	}
-}
-
-static void		change_history(void)
-{
-
 }
 
 void			escape_evt(t_nboon *l)
@@ -70,14 +74,14 @@ void			escape_evt(t_nboon *l)
 	if (key[0] == 91)
 	{
 		if (key[1] == LEFT_KEY)
-			move_left(l);
+			move_left_evt(l);
 		else if (key[1] == RIGHT_KEY)
-			move_right(l);
+			move_right_evt(l);
 		else if (key[1] == UP_KEY)
 			change_history();
 		else if (key[1] == DOWN_KEY)
 			change_history();
 		else if (key[1] > 48 && key[1] < 55)
-			escape_extended(l);
+			escape_extended(l, key[1]);
 	}
 }

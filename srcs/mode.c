@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 05:34:28 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/26 13:20:52 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/27 20:03:15 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static struct termios	orig_termios;
 static int				is_raw = 0;
 
 //errno = ENOTTY;
-int				enable_raw(int fd)
+int				nb_enable_raw(int fd)
 {
 	struct termios		raw;
 
@@ -44,7 +44,7 @@ int				enable_raw(int fd)
 	return (0);
 }
 
-void				disable_raw(int fd)
+void				nb_disable_raw(int fd)
 {
 	if (is_raw && tcsetattr(fd, TCSAFLUSH, &orig_termios) != -1)
 		is_raw = 0;

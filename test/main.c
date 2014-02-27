@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 04:03:09 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/26 17:00:45 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/27 19:45:09 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int		main(void)
 	//nb_set_completion_callback(completion);
 	//nb_history_load("history.txt");
 	//nb_history_set_max_len(len);
-	while((line = get_line("hello> ")) != NULL)
+	while((line = nb_get_line("hello> ")) != NULL)
 	{
 		/* Do something with the string. */
 		if (line[0] != '\0' && line[0] != '/')

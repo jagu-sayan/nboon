@@ -6,13 +6,13 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 05:09:16 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/26 05:24:50 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/27 19:38:48 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nboon.h"
 
-void			ctrl_w_evt(t_nboon *s)
+void			ctrl_w_evt(t_nboon *l)
 {
 
 }

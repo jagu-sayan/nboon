@@ -5,8 +5,8 @@
 #                                                     +:+ +:+         +:+      #
 #    By: jzak </var/mail/jzak>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2014/02/27 14:09:09 by jzak              #+#    #+#              #
-#    Updated: 2014/02/27 14:09:09 by jzak             ###   ########.fr        #
+#    Created: 2014/02/27 19:27:54 by jzak              #+#    #+#              #
+#    Updated: 2014/02/27 19:27:54 by jzak             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -85,10 +85,7 @@ OBJECTS := \
 	$(OBJDIR)/refresh.o \
 	$(OBJDIR)/backspace.o \
 	$(OBJDIR)/ctrl_a.o \
-	$(OBJDIR)/ctrl_b.o \
 	$(OBJDIR)/ctrl_e.o \
-	$(OBJDIR)/ctrl_f.o \
-	$(OBJDIR)/ctrl_h.o \
 	$(OBJDIR)/ctrl_k.o \
 	$(OBJDIR)/ctrl_l.o \
 	$(OBJDIR)/ctrl_n.o \
@@ -185,16 +182,7 @@ $(OBJDIR)/backspace.o: srcs/evt/backspace.c
 $(OBJDIR)/ctrl_a.o: srcs/evt/ctrl_a.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/ctrl_b.o: srcs/evt/ctrl_b.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ctrl_e.o: srcs/evt/ctrl_e.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/ctrl_f.o: srcs/evt/ctrl_f.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/ctrl_h.o: srcs/evt/ctrl_h.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/ctrl_k.o: srcs/evt/ctrl_k.c
