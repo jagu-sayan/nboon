@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 00:48:09 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/26 17:13:45 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/27 14:09:00 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ void			*nb_memmove(void *s1, const void *s2, size_t n);
 
 int				enable_raw(int fd);
 void			disable_raw(int fd);
+
+void			refresh_line(t_nboon *l);
 
 /*
 ** Event function (in evt folder)

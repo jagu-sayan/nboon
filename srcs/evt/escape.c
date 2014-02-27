@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 05:09:17 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/26 18:41:25 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/27 14:52:54 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static void		escape_extended(t_nboon *l)
 			nb_memmove(&l->buf[l->pos], &l->buf[l->pos + 1], l->len - l->pos - 1);
 			l->len--;
 			l->buf[l->len] = '\0';
-			refreshLine(l);
+			refresh_line(l);
 		}
 	}
 }
@@ -42,17 +42,24 @@ static void		move_left(t_nboon *l)
 	if (l->pos > 0)
 	{
 		l->pos--;
-		refresh_line(l);
+		write(l->fd, "\x1b[1D", nb_strlen("\x1b[1D"));
+		/* refresh_line(l); */
 	}
 }
 
 static void		move_right(t_nboon *l)
 {
-	if (l->pos > 0)
+	if (l->pos < l->len)
 	{
-		l->pos--;
-		refresh_line(l);
+		l->pos++;
+		write(l->fd, "\x1b[1C", nb_strlen("\x1b[1C"));
+		/* refresh_line(l); */
 	}
+}
+
+static void		change_history(void)
+{
+
 }
 
 void			escape_evt(t_nboon *l)

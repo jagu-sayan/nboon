@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 00:53:03 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/26 18:18:23 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/27 14:48:41 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,15 +53,6 @@ static int		execute_evt(t_nboon *s, int evt)
 	return (0);
 }
 
-#include <stdio.h>
-void			refresh_line(t_nboon *l)
-{
-	write(l->fd, "\x1b[0G\x1b[0K", nb_strlen("\x1b[0G\x1b[0K"));
-
-	write(l->fd, l->prompt, l->plen),
-	write(l->fd, l->buf, l->len);
-}
-
 static void		insert_char(t_nboon *l, char c)
 {
 	if (l->len < l->buflen)
@@ -96,8 +87,8 @@ static int		line_edit(int fd, char *buf, size_t len, const char *prompt)
 			return (-1);
 		else if (c == CTRL_C)
 			return (0);
-		execute_evt(&state, c);
-		insert_char(&state, c);
+		if (execute_evt(&state, c) == 0)
+			insert_char(&state, c);
 	}
 	return (0);
 }
