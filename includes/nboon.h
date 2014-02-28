@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 00:48:09 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/27 19:57:47 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/28 16:13:49 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 
 # define LINE_BUF_SIZE  4096
 # define WRITE_BUF_SIZE 32
+# define HISTORY_SIZE   4096
 
 # define ESC       0x1b
 
@@ -37,7 +38,7 @@
 # define CTRL_E    5
 # define CTRL_L    12
 # define CTRL_W    23
-# define CTRL_V    16
+# define CTRL_V    22
 # define ESCAPE    27
 
 typedef unsigned int	t_uint;
@@ -106,10 +107,14 @@ void			move_left_evt(t_nboon *l);
 void			delete_evt(t_nboon *l);
 
 /*
-** Public api (nboon.c, mode.c)
+** Public api (mode.c, nboon.c, history.c)
 */
 int				nb_enable_raw(int fd);
 void			nb_disable_raw(int fd);
 char			*nb_get_line(const char *prompt);
+int				nb_history_set_max_size(size_t size);
+int				nb_history_add(const char *line);
+int				nb_history_save(const char *filename);
+int				nb_history_load(const char *filename);
 
 #endif /* NBOON_H */
