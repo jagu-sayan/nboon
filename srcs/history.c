@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 13:04:11 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/28 16:17:25 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/28 10:23:48 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int				nb_history_save(const char *filename)
 	int		fd;
 	t_uint	i;
 
-	if ((fd = open(filename, O_RDONLY | O_TRUNC | O_CREAT)) == -1)
+	if ((fd = open(filename, O_RDONLY | O_TRUNC | O_CREAT, 0660)) == -1)
 		return (-1);
 	i = 0;
 	while (i < history_idx)
