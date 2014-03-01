@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 04:03:09 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/28 16:14:59 by jzak             ###   ########.fr       */
+/*   Updated: 2014/02/28 16:51:39 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int		main(void)
 	char	*line;
 	
 	//nb_set_completion_callback(completion);
-	nb_history_set_max_size(10);
+	nb_history_init(4);
 	nb_history_load(HISTORY_FILE);
 	while((line = nb_get_line("hello> ")) != NULL)
 	{

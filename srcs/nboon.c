@@ -6,21 +6,17 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 00:53:03 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/27 20:01:20 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/01 19:08:32 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include "internal.h"
 #include "nboon.h"
 
-//errno = ENOTTY;
-static int		execute_evt(t_nboon *s, int evt)
-{
-	int			i;
-	t_nbevent	evt_fn[]= {
+static t_nbevent	g_evt_fn[]= {
 		{ TAB, tab_evt },
-		{ ENTER, enter_evt },
 		{ BACKSPACE, backspace_evt },
 		{ CTRL_H, backspace_evt },
 		{ CTRL_T, ctrl_t_evt },
@@ -36,14 +32,21 @@ static int		execute_evt(t_nboon *s, int evt)
 		{ CTRL_W, ctrl_w_evt },
 		{ ESCAPE, escape_evt },
 		{ -1, NULL }
-	};
+};
+
+/*
+** errno = ENOTTY;
+*/
+static int		execute_evt(t_nboon *s, int evt)
+{
+	int					i;
 
 	i = 0;
-	while (evt_fn[i].evt != -1)
+	while (g_evt_fn[i].evt != -1)
 	{
-		if (evt_fn[i].evt == evt)
+		if (g_evt_fn[i].evt == evt)
 		{
-			evt_fn[i].fn(s);
+			g_evt_fn[i].fn(s);
 			return (1);
 		}
 		++i;
@@ -74,35 +77,23 @@ static int		get_columns(void)
 	return (ws.ws_col);
 }
 
-static int		line_edit(int fd, char *buf, const char *prompt)
+static int		line_edit(t_nboon *l)
 {
-	t_nboon		line;
 	char		c;
 
-	line.fd = fd;
-	line.buf = buf;
-	line.b_len = 0;
-	line.b_pos = 0;
-	line.prompt = prompt;
-	line.p_len = nb_strlen(prompt);
-	line.cols = get_columns();
-	line.rows = 0;
-	buf[0] = '\0';
-	write(fd, prompt, line.p_len);
-	while (read(fd, &c, 1) > 0)
+	write(l->fd, l->prompt, l->p_len);
+	while (read(l->fd, &c, 1) > 0)
 	{
 		if (c == CTRL_D)
 		{
-			if (line.b_len == 0)
+			if (l->b_len == 0)
 				return (-1);
-			delete_evt(&line);
+			delete_evt(l);
 		}
 		else if (c == CTRL_C || c == ENTER)
 			return (0);
-		else if (c == CTRL_V)
-			return (0);
-		else if (execute_evt(&line, c) == 0)
-			insert_char(&line, c);
+		else if (execute_evt(l, c) == 0)
+			insert_char(l, c);
 	}
 	return (0);
 }
@@ -116,13 +107,21 @@ static int		line_edit(int fd, char *buf, const char *prompt)
 **/
 char			*nb_get_line(const char *prompt)
 {
-	char	buf[LINE_BUF_SIZE];
-	int		count;
+	t_nboon		line;
+	int			count;
 
+	line.fd = STDIN_FILENO;
+	line.buf[0] = '\0';
+	line.b_len = 0;
+	line.b_pos = 0;
+	line.prompt = prompt;
+	line.p_len = nb_strlen(prompt);
+	line.cols = get_columns();
+	line.rows = 0;
 	count = -1;
 	if (isatty(STDIN_FILENO) && nb_enable_raw(STDIN_FILENO) != -1)
 	{
-		count = line_edit(STDIN_FILENO, buf, prompt);
+		count = line_edit(&line);
 		nb_disable_raw(STDIN_FILENO);
 		write(1, "\n", 1);
 		if (count == -1)
@@ -130,5 +129,5 @@ char			*nb_get_line(const char *prompt)
 	}
 	else
 		return (NULL);
-	return (nb_strdup(buf));
+	return (nb_strdup(line.buf));
 }

@@ -6,13 +6,15 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 05:09:16 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/26 05:24:41 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/01 17:37:33 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "internal.h"
 #include "nboon.h"
 
-void			ctrl_l_evt(t_nboon *s)
+void			ctrl_l_evt(t_nboon *l)
 {
-
+	nb_clear_screen();
+	refresh_line(l);
 }

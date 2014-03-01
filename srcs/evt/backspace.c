@@ -6,11 +6,11 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 05:09:03 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/27 19:39:27 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/01 17:35:56 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "nboon.h"
+#include "internal.h"
 
 void			backspace_evt(t_nboon *l)
 {

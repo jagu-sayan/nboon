@@ -5,8 +5,8 @@
 #                                                     +:+ +:+         +:+      #
 #    By: jzak </var/mail/jzak>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2014/02/27 19:27:54 by jzak              #+#    #+#              #
-#    Updated: 2014/02/27 19:27:54 by jzak             ###   ########.fr        #
+#    Created: 2014/03/01 18:33:10 by jzak              #+#    #+#              #
+#    Updated: 2014/03/01 18:33:10 by jzak             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -79,6 +79,7 @@ NAME = nboon
 OBJECTS := \
 	$(OBJDIR)/completion.o \
 	$(OBJDIR)/history.o \
+	$(OBJDIR)/history_file.o \
 	$(OBJDIR)/lib.o \
 	$(OBJDIR)/mode.o \
 	$(OBJDIR)/nboon.o \
@@ -93,9 +94,7 @@ OBJECTS := \
 	$(OBJDIR)/ctrl_t.o \
 	$(OBJDIR)/ctrl_u.o \
 	$(OBJDIR)/ctrl_w.o \
-	$(OBJDIR)/enter.o \
 	$(OBJDIR)/escape.o \
-	$(OBJDIR)/tab.o \
 
 RESOURCES := \
 
@@ -164,6 +163,9 @@ $(OBJDIR)/completion.o: srcs/completion.c
 $(OBJDIR)/history.o: srcs/history.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/history_file.o: srcs/history_file.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lib.o: srcs/lib.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
@@ -206,13 +208,7 @@ $(OBJDIR)/ctrl_u.o: srcs/evt/ctrl_u.c
 $(OBJDIR)/ctrl_w.o: srcs/evt/ctrl_w.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/enter.o: srcs/evt/enter.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/escape.o: srcs/evt/escape.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/tab.o: srcs/evt/tab.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 

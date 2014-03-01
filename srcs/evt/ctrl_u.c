@@ -6,11 +6,11 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 05:09:12 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/27 19:40:43 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/01 17:36:30 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "nboon.h"
+#include "internal.h"
 
 void			ctrl_u_evt(t_nboon *l)
 {

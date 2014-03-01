@@ -6,13 +6,12 @@
 /*   By: jzak </var/mail/jzak>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/27 14:04:54 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/27 19:00:13 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/01 17:35:01 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
-#include <stdio.h> // XXX
-#include "nboon.h"
+#include "internal.h"
 
 static void		s_memcpy(char *dest, t_uint *dest_idx, const char *src)
 {
@@ -62,6 +61,4 @@ void			refresh_line(t_nboon *l)
 	write_vt100(l->fd, "K", 0, -1);
 	write_vt100(l->fd, "G", 0, -1);
 	write_vt100(l->fd, "C", l->p_len + l->b_pos, -1);
-	/* write_vt100(l->fd, "u", -1, -1); */
 }
-

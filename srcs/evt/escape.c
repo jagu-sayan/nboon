@@ -6,24 +6,15 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 05:09:17 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/27 19:39:54 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/01 18:44:01 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
-#include "nboon.h"
+#include "internal.h"
 
-#define UP_KEY 65
-#define DOWN_KEY 66
-#define RIGHT_KEY 67
-#define LEFT_KEY 68
-
-static void		change_history(void)
-{
-
-}
 
 static void		escape_extended(t_nboon *l, char evt)
 {
@@ -78,9 +69,9 @@ void			escape_evt(t_nboon *l)
 		else if (key[1] == RIGHT_KEY)
 			move_right_evt(l);
 		else if (key[1] == UP_KEY)
-			change_history();
+			ctrl_p_evt(l);
 		else if (key[1] == DOWN_KEY)
-			change_history();
+			ctrl_n_evt(l);
 		else if (key[1] > 48 && key[1] < 55)
 			escape_extended(l, key[1]);
 	}
