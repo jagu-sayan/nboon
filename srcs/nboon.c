@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 00:53:03 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/12 22:21:34 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/12 23:46:55 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,15 @@
 static void		insert_utf8(t_nboon *l, char *data, int size)
 {
 	t_uint		i;
+	t_utf8		c;
 
 	i = 0;
-	l->b_curor += get_display_width(get_next_char(data, &i));
+	c = 1;
+	while (c != 0)
+	{
+		c = get_next_char(data, &i);
+		l->b_curor += get_display_width(c);
+	}
 	i = 0;
 	if (l->b_len != l->b_pos)
 		nb_memmove(&l->buf[l->b_pos + size], &l->buf[l->b_pos], l->b_len - l->b_pos);
@@ -46,12 +52,13 @@ static int		get_columns(void)
 
 static int		line_edit(t_nboon *l)
 {
-	char	c[5] = { 0 };
-	int			ret;
+	char	c[LINE_BUF_SIZE] = { 0 };
+	int		ret;
 
 	write(l->fd, l->prompt, l->p_len);
-	while ((ret = read(l->fd, &c, 4)) > 0)
+	while ((ret = read(l->fd, &c, LINE_BUF_SIZE)) > 0)
 	{
+		c[ret] = '\0';
 		if (c[0] == CTRL_D)
 		{
 			if (l->b_len == 0)
@@ -62,7 +69,6 @@ static int		line_edit(t_nboon *l)
 			return (0);
 		else if (execute_evt(l, c[0], &c[1]) == 0)
 			insert_utf8(l, c, ret);
-		c[0] = c[1] = c[2] = c[3] = c[4] = 0;
 	}
 	return (0);
 }

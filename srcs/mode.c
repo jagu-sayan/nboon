@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 05:34:28 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/12 18:32:30 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/12 23:20:31 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ int				nb_enable_raw(int fd)
 
 	if (tcgetattr(fd, &g_orig_termios) == -1)
 		return (-1);
-
 	raw = g_orig_termios;
 	raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON | IUTF8);
 	raw.c_oflag &= ~(OPOST);
