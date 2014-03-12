@@ -6,7 +6,7 @@
 /*   By: jzak </var/mail/jzak>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/03/01 17:23:03 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/01 19:05:35 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/12 19:46:20 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # define WRITE_BUF_SIZE 32
 # define HISTORY_SIZE   0
 
-# define ESC       0x1b
+# define ESC       27
 # define UP_KEY    65
 # define DOWN_KEY  66
 # define RIGHT_KEY 67
@@ -43,12 +43,12 @@
 # define CTRL_L    12
 # define CTRL_W    23
 # define CTRL_V    22
-# define ESCAPE    27
 
 /*
 ** Basic type
 */
 typedef unsigned int	t_uint;
+typedef unsigned int	t_utf8;
 
 /*
 ** Global (history.c)
@@ -56,6 +56,15 @@ typedef unsigned int	t_uint;
 extern char				**g_history;
 extern size_t			g_history_size;
 extern t_uint			g_history_idx;
+
+/*
+** Interval structure for binary search
+*/
+typedef struct			s_interval
+{
+	t_utf8				first;
+	t_utf8				last;
+}						t_interval;
 
 /*
 ** The s_nboon structure represents the state during line editing.
@@ -68,6 +77,7 @@ typedef struct			s_nboon
 	char				buf[LINE_BUF_SIZE];
 	t_uint				b_len;
 	t_uint				b_pos;
+	t_uint				b_curor;
 	const char *		prompt;
 	t_uint				p_len;
 	t_uint				cols;
@@ -97,8 +107,9 @@ char			*nb_itoa(int n);
 void			refresh_line(t_nboon *l);
 
 /*
-** Event function (in evt folder)
+** Event function (in evt folder and evt.c)
 */
+int				execute_evt(t_nboon *l, int evt, char *key);
 void			backspace_evt(t_nboon *l);
 void			ctrl_t_evt(t_nboon *l);
 void			ctrl_p_evt(t_nboon *l);
@@ -109,6 +120,9 @@ void			ctrl_a_evt(t_nboon *l);
 void			ctrl_e_evt(t_nboon *l);
 void			ctrl_l_evt(t_nboon *l);
 void			ctrl_w_evt(t_nboon *l);
+void			move_right_evt(t_nboon *l);
+void			move_left_evt(t_nboon *l);
+void			delete_evt(t_nboon *l);
 
 /*
 ** Tab completion evt (completion.c)
@@ -116,11 +130,10 @@ void			ctrl_w_evt(t_nboon *l);
 void			tab_evt(t_nboon *l);
 
 /*
-** Escape event function (evt/escape.c)
+** unicode.c
 */
-void			escape_evt(t_nboon *l);
-void			move_right_evt(t_nboon *l);
-void			move_left_evt(t_nboon *l);
-void			delete_evt(t_nboon *l);
+int				get_display_width(t_utf8 c);
+t_utf8			get_next_char(const char *s, t_uint *idx);
+t_utf8			get_prev_char(const char *s, t_uint *idx);
 
 #endif /* INTERNAL_H */

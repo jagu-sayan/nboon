@@ -6,11 +6,11 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/03/10 23:17:46 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/11 12:29:02 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/12 20:29:53 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "unicode.h"
+#include "internal.h"
 
 /*
 ** sorted list of non-overlapping intervals of non-spacing characters
@@ -67,7 +67,12 @@ static const t_interval		g_table[142] = {
 	{ 0xE0100, 0xE01EF }
 };
 
-static int	bisearch(t_utf8 c)
+static const t_uint			g_offsets_from_utf8[6] = {
+	0x00000000UL, 0x00003080UL, 0x000E2080UL,
+	0x03C82080UL, 0xFA082080UL, 0x82082080UL
+};
+
+static int		bisearch(t_utf8 c)
 {
 	int		min;
 	int		max;
@@ -85,17 +90,19 @@ static int	bisearch(t_utf8 c)
 		else if (c < g_table[mid].first)
 			max = mid - 1;
 		else
-			return 1;
+			return (1);
 	}
 	return (0);
 }
-
-int			get_display_width(t_utf8 c)
+#define isutf(c) (((c)&0xC0)!=0x80)
+int				get_display_width(t_utf8 c)
 {
 	if (c == 0)
 		return (0);
 	if (c < 32 || (c >= 0X7f && c < 0xa0))
 		return (-1);
+	if (bisearch(c))
+		return (0);
 	return (1 + (c >= 0x1100
 			&& (c <= 0x115f || c == 0x2329 || c == 0x232a
 				|| (c >= 0x2e80 && c <= 0xa4cf && c != 0x303f)
@@ -109,19 +116,29 @@ int			get_display_width(t_utf8 c)
 				|| (c >= 0x30000 && c <= 0x3fffd))));
 }
 
-void		get_prev_char(const char *s, int *idx)
+t_utf8			get_next_char(const char *s, t_uint *idx)
 {
+	t_uint	ch;
+	int		sz;
 
+	ch = (unsigned char)s[(*idx)++];
+	sz = 1;
+	while (s[*idx] && (s[*idx] & 0xC0) == 0x80)
+	{
+		ch <<= 6;
+		ch += (unsigned char)s[(*idx)++];
+		sz++;
+	}
+	ch -= g_offsets_from_utf8[sz - 1];
+	return (ch);
 }
 
-/* int		main(void) */
-/* { */
-/* 	char	c; */
-/*  */
-/* 	while (read(1, &c, 1)); */
-/* 	{ */
-/*  */
-/* 	} */
-/* 	bisearch('b'); */
-/* 	return (0); */
-/* } */
+t_utf8			get_prev_char(const char *s, t_uint *idx)
+{
+	t_uint	save;
+
+	 (void)(isutf(s[--(*idx)]) || isutf(s[--(*idx)])
+		|| isutf(s[--(*idx)]) || --(*idx));
+	 save = *idx;
+	 return (get_next_char(s, &save));
+}

@@ -6,7 +6,7 @@
 /*   By: jzak </var/mail/jzak>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/27 14:04:54 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/01 17:35:01 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/12 21:47:20 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ static void		write_vt100(int fd, const char *str, int nbr1, int nbr2)
 		s2 = nb_itoa((int)nbr2);
 	idx = 2;
 	s_memcpy(buf, &idx, s1);
+	if (nbr2 >= 0)
+		s_memcpy(buf, &idx, ";");
 	s_memcpy(buf, &idx, s2);
 	s_memcpy(buf, &idx, str);
 	buf[idx] = '\0';
@@ -56,9 +58,12 @@ static void		write_vt100(int fd, const char *str, int nbr1, int nbr2)
 void			refresh_line(t_nboon *l)
 {
 	write_vt100(l->fd, "G", 0, -1);
-	write(l->fd, l->prompt, l->p_len),
+	/* write(STDIN_FILENO, "\x1b[4h", 4); */
+	write(l->fd, "\x1b[1M", 4);
+	write(l->fd, l->prompt, l->p_len);
 	write(l->fd, l->buf, l->b_len);
-	write_vt100(l->fd, "K", 0, -1);
+	/* write_vt100(l->fd, "K", -1, -1); */
+	/* write_vt100(l->fd, "s", -1, -1); */
 	write_vt100(l->fd, "G", 0, -1);
-	write_vt100(l->fd, "C", l->p_len + l->b_pos, -1);
+	write_vt100(l->fd, "C", l->b_curor + l->p_len, -1);
 }

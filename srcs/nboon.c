@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 00:53:03 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/01 19:08:32 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/12 22:21:34 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,57 +15,24 @@
 #include "internal.h"
 #include "nboon.h"
 
-static t_nbevent	g_evt_fn[]= {
-		{ TAB, tab_evt },
-		{ BACKSPACE, backspace_evt },
-		{ CTRL_H, backspace_evt },
-		{ CTRL_T, ctrl_t_evt },
-		{ CTRL_B, move_left_evt },
-		{ CTRL_F, move_right_evt },
-		{ CTRL_P, ctrl_p_evt },
-		{ CTRL_N, ctrl_n_evt },
-		{ CTRL_U, ctrl_u_evt },
-		{ CTRL_K, ctrl_k_evt },
-		{ CTRL_A, ctrl_a_evt },
-		{ CTRL_E, ctrl_e_evt },
-		{ CTRL_L, ctrl_l_evt },
-		{ CTRL_W, ctrl_w_evt },
-		{ ESCAPE, escape_evt },
-		{ -1, NULL }
-};
-
-/*
-** errno = ENOTTY;
-*/
-static int		execute_evt(t_nboon *s, int evt)
+static void		insert_utf8(t_nboon *l, char *data, int size)
 {
-	int					i;
+	t_uint		i;
 
 	i = 0;
-	while (g_evt_fn[i].evt != -1)
+	l->b_curor += get_display_width(get_next_char(data, &i));
+	i = 0;
+	if (l->b_len != l->b_pos)
+		nb_memmove(&l->buf[l->b_pos + size], &l->buf[l->b_pos], l->b_len - l->b_pos);
+	while (data[i] != '\0')
 	{
-		if (g_evt_fn[i].evt == evt)
-		{
-			g_evt_fn[i].fn(s);
-			return (1);
-		}
-		++i;
-	}
-	return (0);
-}
-
-static void		insert_char(t_nboon *l, char c)
-{
-	if (l->b_len < LINE_BUF_SIZE)
-	{
-		if (l->b_len != l->b_pos)
-			nb_memmove(&l->buf[l->b_pos + 1], &l->buf[l->b_pos], l->b_len - l->b_pos);
-		l->buf[l->b_pos] = c;
+		l->buf[l->b_pos] = data[i];
 		l->b_pos++;
 		l->b_len++;
-		l->buf[l->b_len] = '\0';
-		refresh_line(l);
+		++i;
 	}
+	l->buf[l->b_len] = '\0';
+	refresh_line(l);
 }
 
 static int		get_columns(void)
@@ -79,21 +46,23 @@ static int		get_columns(void)
 
 static int		line_edit(t_nboon *l)
 {
-	char		c;
+	char	c[5] = { 0 };
+	int			ret;
 
 	write(l->fd, l->prompt, l->p_len);
-	while (read(l->fd, &c, 1) > 0)
+	while ((ret = read(l->fd, &c, 4)) > 0)
 	{
-		if (c == CTRL_D)
+		if (c[0] == CTRL_D)
 		{
 			if (l->b_len == 0)
 				return (-1);
 			delete_evt(l);
 		}
-		else if (c == CTRL_C || c == ENTER)
+		else if (c[0] == CTRL_C || c[0] == ENTER)
 			return (0);
-		else if (execute_evt(l, c) == 0)
-			insert_char(l, c);
+		else if (execute_evt(l, c[0], &c[1]) == 0)
+			insert_utf8(l, c, ret);
+		c[0] = c[1] = c[2] = c[3] = c[4] = 0;
 	}
 	return (0);
 }
@@ -114,6 +83,7 @@ char			*nb_get_line(const char *prompt)
 	line.buf[0] = '\0';
 	line.b_len = 0;
 	line.b_pos = 0;
+	line.b_curor = 0;
 	line.prompt = prompt;
 	line.p_len = nb_strlen(prompt);
 	line.cols = get_columns();

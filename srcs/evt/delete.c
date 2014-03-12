@@ -1,23 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   backspace.c                                        :+:      :+:    :+:   */
+/*   delete.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/02/26 05:09:03 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/12 22:23:58 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/12 19:15:04 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/12 22:24:52 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include "internal.h"
 
-void			backspace_evt(t_nboon *l)
+void			delete_evt(t_nboon *l)
 {
-	if (l->b_pos > 0)
+	t_uint		pos;
+
+	if (l->b_len > 0 && l->b_pos < l->b_len)
 	{
-		l->b_curor -= get_display_width(get_prev_char(l->buf, &l->b_pos));
-		delete_evt(l);
+		pos = l->b_pos;
+		get_next_char(l->buf, &pos);
+		nb_memmove(&l->buf[l->b_pos], &l->buf[pos], l->b_len - l->b_pos - 1);
+		l->b_len -= (pos - l->b_pos);
+		l->buf[l->b_len] = '\0';
+		refresh_line(l);
 	}
 }
