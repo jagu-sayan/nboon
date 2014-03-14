@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    test.make                                          :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jagu </var/spool/mail/jagu>                +#+  +:+       +#+         #
+#    By: jzak </var/mail/jzak>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2014/03/14 19:36:13 by jagu              #+#    #+#              #
-#    Updated: 2014/03/14 19:36:13 by jagu             ###   ########.fr        #
+#    Created: 2014/03/14 20:06:41 by jzak              #+#    #+#              #
+#    Updated: 2014/03/14 20:06:41 by jzak             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,7 +39,7 @@ ifeq ($(config),release)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 -Wall -Wextra -Werror
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -s -Lbin
+  LDFLAGS   += -Wl,-x -Lbin
   LIBS      += -lnboon
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += bin/libnboon.a
@@ -75,6 +75,8 @@ ifeq ($(config),debug)
   define POSTBUILDCMDS
   endef
 endif
+
+NAME = test
 
 OBJECTS := \
 	$(OBJDIR)/main.o \
@@ -114,6 +116,8 @@ ifeq (posix,$(SHELLTYPE))
 else
 	$(SILENT) mkdir $(subst /,\\,$(OBJDIR))
 endif
+
+$(NAME): all
 
 clean:
 	@echo Cleaning test
