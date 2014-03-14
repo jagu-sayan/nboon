@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 00:53:03 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/12 23:46:55 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/14 15:58:47 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,15 @@ static int		line_edit(t_nboon *l)
 				return (-1);
 			delete_evt(l);
 		}
-		else if (c[0] == CTRL_C || c[0] == ENTER)
+		else if (c[0] == CTRL_C || c[0] == ENTER || c[0] == CTRL_J)
 			return (0);
 		else if (execute_evt(l, c[0], &c[1]) == 0)
-			insert_utf8(l, c, ret);
+		{
+			if (l->b_len + ret < LINE_BUF_SIZE)
+				insert_utf8(l, c, ret);
+			else
+				return (-1);
+		}
 	}
 	return (0);
 }

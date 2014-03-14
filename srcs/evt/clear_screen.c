@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctrl_a.c                                           :+:      :+:    :+:   */
+/*   clear_screen.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/02/26 05:09:14 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/11 14:37:06 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/14 16:12:08 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/14 16:12:18 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "internal.h"
+#include "nboon.h"
 
-void			ctrl_a_evt(t_nboon *l)
+void			clear_screen_evt(t_nboon *l)
 {
-	l->b_pos = 0;
-	l->b_curor = 0;
+	nb_clear_screen();
 	refresh_line(l);
 }

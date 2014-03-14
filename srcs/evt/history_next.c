@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctrl_k.c                                           :+:      :+:    :+:   */
+/*   history_next.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/02/26 05:09:13 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/01 17:36:30 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/14 16:07:31 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/14 16:07:45 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "internal.h"
+#include "nboon.h"
 
-void			ctrl_k_evt(t_nboon *l)
+void			history_next_evt(t_nboon *l)
 {
-	l->buf[l->b_pos] = '\0';
-	l->b_len = l->b_pos;
+	nb_history_prev();
 	refresh_line(l);
 }

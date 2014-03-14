@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctrl_e.c                                           :+:      :+:    :+:   */
+/*   history_prev.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/02/26 05:09:15 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/12 22:59:36 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/14 16:07:49 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/14 16:08:06 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "internal.h"
+#include "nboon.h"
 
-void			ctrl_e_evt(t_nboon *l)
+void			history_prev_evt(t_nboon *l)
 {
-	while (l->b_pos < l->b_len)
-		l->b_curor += get_display_width(get_next_char(l->buf, &l->b_pos));
+	nb_history_prev();
 	refresh_line(l);
 }

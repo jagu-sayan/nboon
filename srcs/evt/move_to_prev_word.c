@@ -1,20 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctrl_l.c                                           :+:      :+:    :+:   */
+/*   move_to_prev_word.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/02/26 05:09:16 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/01 17:37:33 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/14 19:01:40 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/14 19:19:20 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "internal.h"
-#include "nboon.h"
 
-void			ctrl_l_evt(t_nboon *l)
+void			move_to_prev_word_evt(t_nboon *l)
 {
-	nb_clear_screen();
+	t_utf8		c;
+
+	c = 32;
+	while (l->b_pos > 0 && (c == ' ' || c == '\t'))
+	{
+		c = get_prev_char(l->buf, &l->b_pos);
+		l->b_curor -= get_display_width(c);
+	}
+	c = 0;
+	while (l->b_pos > 0 && (c != ' ' && c != '\t'))
+	{
+		c = get_prev_char(l->buf, &l->b_pos);
+		l->b_curor -= get_display_width(c);
+	}
 	refresh_line(l);
 }

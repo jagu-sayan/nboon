@@ -6,7 +6,7 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/02/26 04:03:09 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/28 16:51:39 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/14 19:09:48 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,6 @@ int		main(void)
 		free(line);
 	}
 	nb_history_save(HISTORY_FILE);
+	nb_history_free();
 	return (0);
 }

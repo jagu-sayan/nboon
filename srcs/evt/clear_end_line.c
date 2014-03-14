@@ -1,18 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   unicode.h                                          :+:      :+:    :+:   */
+/*   clear_end_line.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/10 23:32:04 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/12 18:38:50 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/14 16:14:46 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/14 16:15:10 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UNICODE_H
-# define UNICODE_H
+#include "internal.h"
 
-# define IS_UTF(c) (((c)&0xC0)!=0x80)
-
-#endif /* !UNICODE_H */
+void			clear_end_line_evt(t_nboon *l)
+{
+	l->buf[l->b_pos] = '\0';
+	l->b_len = l->b_pos;
+	refresh_line(l);
+}

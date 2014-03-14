@@ -6,34 +6,44 @@
 /*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/03/12 18:49:10 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/12 19:30:32 by jzak             ###   ########.fr       */
+/*   Updated: 2014/03/14 19:36:58 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "internal.h"
 
 static t_nbevent	g_evt_fn[]= {
-		{ TAB, tab_evt },
 		{ BACKSPACE, backspace_evt },
 		{ CTRL_H, backspace_evt },
-		{ CTRL_T, ctrl_t_evt },
 		{ CTRL_B, move_left_evt },
 		{ CTRL_F, move_right_evt },
-		{ CTRL_P, ctrl_p_evt },
-		{ CTRL_N, ctrl_n_evt },
-		{ CTRL_U, ctrl_u_evt },
-		{ CTRL_K, ctrl_k_evt },
-		{ CTRL_A, ctrl_a_evt },
-		{ CTRL_E, ctrl_e_evt },
-		{ CTRL_L, ctrl_l_evt },
-		{ CTRL_W, ctrl_w_evt },
+		{ CTRL_A, move_home_evt },
+		{ CTRL_E, move_end_evt },
+		{ CTRL_L, clear_screen_evt },
+		{ CTRL_U, clear_line_evt },
+		{ CTRL_K, clear_end_line_evt },
+		{ CTRL_P, history_prev_evt },
+		{ CTRL_N, history_next_evt },
+		{ CTRL_W, del_word_evt },
+		{ CTRL_T, swap_letter_evt },
+		{ HT_TAB, tab_evt },
 		{ -1, NULL }
 };
 
 static void		escape_extended(t_nboon *l, char evt, char *key)
 {
-	if (evt == 51 && key[0] == DELETE)
+	if (evt == '3' && key[0] == DELETE_KEY)
 		delete_evt(l);
+	else if (evt == '1' && key[0] == ';')
+	{
+		if (key[1] == SHIFT_KEY || key[1] == CTRL_KEY)
+		{
+			if (key[2] == LEFT_KEY)
+				move_to_prev_word_evt(l);
+			else if (key[2] == RIGHT_KEY)
+				move_to_next_word_evt(l);
+		}
+	}
 }
 
 static int		escape_evt(t_nboon *l, char *key)
@@ -45,23 +55,35 @@ static int		escape_evt(t_nboon *l, char *key)
 		else if (key[1] == RIGHT_KEY)
 			move_right_evt(l);
 		else if (key[1] == UP_KEY)
-			ctrl_p_evt(l);
+			history_prev_evt(l);
 		else if (key[1] == DOWN_KEY)
-			ctrl_n_evt(l);
-		else if (key[1] > 48 && key[1] < 55)
+			history_next_evt(l);
+		else if (key[1] == HOME_KEY)
+			move_home_evt(l);
+		else if (key[1] == END_KEY)
+			move_end_evt(l);
+		else if (key[1] >= '0' && key[1] <= '9')
 			escape_extended(l, key[1], &key[2]);
+	}
+	else if (key[0] == 'O')
+	{
+		if (key[1] == HOME_KEY)
+			move_home_evt(l);
+		else if (key[1] == END_KEY)
+			move_end_evt(l);
 	}
 	return (1);
 }
+
 /*
- ** errno = ENOTTY;
- */
+** errno = ENOTTY;
+*/
 int				execute_evt(t_nboon *l, int evt, char *key)
 {
 	int					i;
 
 	i = 0;
-	if (evt == ESC)
+	if (evt == ESCAPE)
 		return (escape_evt(l, key));
 	while (g_evt_fn[i].evt != -1)
 	{
@@ -72,6 +94,7 @@ int				execute_evt(t_nboon *l, int evt, char *key)
 		}
 		++i;
 	}
+	if (evt <= ESCAPE)
+		return (1);
 	return (0);
 }
-
