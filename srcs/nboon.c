@@ -6,7 +6,7 @@
 /*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/03/26 15:24:31 by jzak              #+#    #+#             */
-/*   Updated: 2015/04/03 19:02:48 by jzak             ###   ########.fr       */
+/*   Updated: 2015/04/05 13:00:47 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,6 @@ t_nb_status		nb_get_line(const char *prompt, char **line)
 	l.p_len = expand_prompt(prompt, &l.prompt);
 	l.nbr_rows = 0;
 	nb_refresh_size(0);
-	/* free(*line); */
-	/* *line = NULL; */
 	ret = line_edit(&l);
 	nb_disable_raw(l.fd);
 	free(l.prompt);
