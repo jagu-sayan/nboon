@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   move_home.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/14 16:00:44 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/14 16:01:49 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 18:20:05 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 18:20:06 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,5 +16,5 @@ void			move_home_evt(t_nboon *l)
 {
 	l->b_pos = 0;
 	l->b_curor = 0;
-	refresh_line(l);
+	g_refresh_fn(l);
 }

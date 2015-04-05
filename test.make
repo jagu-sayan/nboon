@@ -5,8 +5,8 @@
 #                                                     +:+ +:+         +:+      #
 #    By: jzak </var/mail/jzak>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2014/03/14 20:06:41 by jzak              #+#    #+#              #
-#    Updated: 2014/03/14 20:06:41 by jzak             ###   ########.fr        #
+#    Created: 2014/03/27 18:51:33 by jzak              #+#    #+#              #
+#    Updated: 2014/03/27 18:51:33 by jzak             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,10 +39,10 @@ ifeq ($(config),release)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 -Wall -Wextra -Werror
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -Wl,-x -Lbin
+  LDFLAGS   += -Wl,-x -L.
   LIBS      += -lnboon
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += bin/libnboon.a
+  LDDEPS    += libnboon.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) \
 			   $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
@@ -62,10 +62,10 @@ ifeq ($(config),debug)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -Wall -Wextra
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -Lbin
+  LDFLAGS   += -L.
   LIBS      += -lnboon
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += bin/libnboon.a
+  LDDEPS    += libnboon.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) \
 			   $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS

@@ -3,16 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   nboon.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/02/26 00:48:09 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/01 18:40:57 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 18:35:12 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/27 21:36:00 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef NBOON_H
 # define NBOON_H
+
 # include <stdlib.h>
+# include "basic.h"
 
 /*
 ** Public api of new boon library
@@ -22,7 +24,25 @@
 /*
 ** Function pointer called when tab is pressed
 */
-typedef void (t_completion_fn)(char *buf, size_t max_size);
+typedef struct	s_line
+{
+	const char	*buf;
+	t_uint		pos;
+	t_uint		size;
+}				t_line;
+
+typedef char	*(t_comp_fn)(const t_line *line, const char *word, size_t n);
+
+/*
+** Status returned by nb_get_line
+*/
+typedef enum	e_nb_status
+{
+	NB_ERROR = -1,
+	NB_SUCCESS = 0,
+	NB_EXIT = 1,
+	NB_INTERRUPT = 2
+}				t_nb_status;
 
 /*
 ** mode.c
@@ -32,21 +52,29 @@ void			nb_disable_raw(int fd);
 void			nb_clear_screen(void);
 
 /*
-** nboon.c
+** Core function (nboon.c, refresh.c, error.c)
 */
-char			*nb_get_line(const char *prompt);
+void			nb_refresh_size(int sig);
+void			nb_set_refresh_callback(t_refresh_fn fn);
+const char		*nb_get_error(void);
+
+t_nb_status		nb_get_line(const char *prompt, char **line);
+int				nb_ask_question(const char *question);
+
+void			nb_refresh_multi_line(t_nboon *l);
+void			nb_refresh_single_line(t_nboon *l);
 
 /*
 ** completion.c
 */
-void			nb_set_completion_callback(t_completion_fn fn);
+void			nb_set_completion_callback(t_comp_fn fn);
 
 /*
 ** history.c
 */
 int				nb_history_init(size_t max_size);
-void			nb_history_next();
-void			nb_history_prev();
+int				nb_history_next();
+int				nb_history_prev();
 int				nb_history_add(const char *line);
 void			nb_history_free(void);
 
@@ -56,4 +84,4 @@ void			nb_history_free(void);
 int				nb_history_save(const char *filename);
 int				nb_history_load(const char *filename);
 
-#endif /* NBOON_H */
+#endif

@@ -1,32 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   move_to_next_word.c                                :+:      :+:    :+:   */
+/*   paste_line.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/26 18:20:28 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/26 18:20:49 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 18:20:39 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/27 19:44:59 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "internal.h"
 
-void			move_to_next_word_evt(t_nboon *l)
+void			paste_line_evt(t_nboon *l)
 {
-	t_utf8		c;
+	int		size;
 
-	c = 32;
-	while (l->b_pos < l->b_len && (c == ' ' || c == '\t'))
+	if (l->paste_line != NULL)
 	{
-		c = get_next_char(l->buf, &l->b_pos);
-		l->b_curor += get_display_width(c);
+		size = (int)nb_strlen(l->paste_line);
+		if (l->b_len + size < LINE_BUF_SIZE)
+			insert_utf8(l, l->paste_line, size);
 	}
-	c = 0;
-	while (l->b_pos < l->b_len && (c != ' ' && c != '\t'))
-	{
-		c = get_next_char(l->buf, &l->b_pos);
-		l->b_curor += get_display_width(c);
-	}
-	g_refresh_fn(l);
 }

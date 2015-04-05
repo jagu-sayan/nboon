@@ -12,7 +12,6 @@
 
 solution "Solutions"
 	configurations	{ "Release", "Debug" }
-	targetdir "bin"
 	objdir "bin/obj"
 	language "C"
 	version = "0.1.1"
@@ -28,12 +27,14 @@ solution "Solutions"
 
 	-- libnboon
 	project "nboon"
+		targetdir "."
 		kind "StaticLib"
 		files { "srcs/**.c" }
 		includedirs { inc }
 
 	-- test
 	project "test"
+		targetdir "bin"
 		kind "ConsoleApp"
 		links { "nboon" }
 		files "test/*.c"

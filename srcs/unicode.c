@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unicode.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/10 23:17:46 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/12 20:29:53 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 15:24:54 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 18:16:07 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ static int		bisearch(t_utf8 c)
 	}
 	return (0);
 }
-#define isutf(c) (((c)&0xC0)!=0x80)
+
 int				get_display_width(t_utf8 c)
 {
 	if (c == 0)
@@ -104,16 +104,40 @@ int				get_display_width(t_utf8 c)
 	if (bisearch(c))
 		return (0);
 	return (1 + (c >= 0x1100
-			&& (c <= 0x115f || c == 0x2329 || c == 0x232a
-				|| (c >= 0x2e80 && c <= 0xa4cf && c != 0x303f)
-				|| (c >= 0xac00 && c <= 0xd7a3)
-				|| (c >= 0xf900 && c <= 0xfaff)
-				|| (c >= 0xfe10 && c <= 0xfe19)
-				|| (c >= 0xfe30 && c <= 0xfe6f)
-				|| (c >= 0xff00 && c <= 0xff60)
-				|| (c >= 0xffe0 && c <= 0xffe6)
-				|| (c >= 0x20000 && c <= 0x2fffd)
-				|| (c >= 0x30000 && c <= 0x3fffd))));
+	&& (c <= 0x115f || c == 0x2329 || c == 0x232a
+	|| (c >= 0x2e80 && c <= 0xa4cf && c != 0x303f)
+	|| (c >= 0xac00 && c <= 0xd7a3)
+	|| (c >= 0xf900 && c <= 0xfaff)
+	|| (c >= 0xfe10 && c <= 0xfe19)
+	|| (c >= 0xfe30 && c <= 0xfe6f)
+	|| (c >= 0xff00 && c <= 0xff60)
+	|| (c >= 0xffe0 && c <= 0xffe6)
+	|| (c >= 0x20000 && c <= 0x2fffd)
+	|| (c >= 0x30000 && c <= 0x3fffd))));
+}
+
+size_t			get_str_display_width(const char *str)
+{
+	size_t		ret;
+	t_uint		idx;
+	t_utf8		c;
+	int			print;
+
+	ret = 0;
+	idx = 0;
+	c = 1;
+	print = 1;
+	while (c != 0)
+	{
+		c = get_next_char(str, &idx);
+		if (c == 1)
+			print = 0;
+		else if (c == 2)
+			print = 1;
+		else if (print)
+			ret += get_display_width(c);
+	}
+	return (ret);
 }
 
 t_utf8			get_next_char(const char *s, t_uint *idx)
@@ -121,6 +145,8 @@ t_utf8			get_next_char(const char *s, t_uint *idx)
 	t_uint	ch;
 	int		sz;
 
+	if (s[*idx] == '\0')
+		return (0);
 	ch = (unsigned char)s[(*idx)++];
 	sz = 1;
 	while (s[*idx] && (s[*idx] & 0xC0) == 0x80)
@@ -137,8 +163,10 @@ t_utf8			get_prev_char(const char *s, t_uint *idx)
 {
 	t_uint	save;
 
-	 (void)(isutf(s[--(*idx)]) || isutf(s[--(*idx)])
-		|| isutf(s[--(*idx)]) || --(*idx));
-	 save = *idx;
-	 return (get_next_char(s, &save));
+	if (*idx == 0)
+		return (0);
+	while (*idx != 0 && (s[--*idx] & 0xC0) == 0x80)
+		;
+	save = *idx;
+	return (get_next_char(s, &save));
 }

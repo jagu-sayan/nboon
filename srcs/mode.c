@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   mode.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/02/26 05:34:28 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/12 23:20:31 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 15:24:19 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 17:28:01 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <termios.h>
 #include <unistd.h>
+#include "basic.h"
 
 static struct termios	g_orig_termios;
 static int				g_is_raw = 0;
@@ -29,17 +30,23 @@ int				nb_enable_raw(int fd)
 {
 	struct termios		raw;
 
-	if (tcgetattr(fd, &g_orig_termios) == -1)
+	if (isatty(fd) == 0 || tcgetattr(fd, &g_orig_termios) == -1)
+	{
+		g_nb_error = ERR_NO_TERM;
 		return (-1);
+	}
 	raw = g_orig_termios;
 	raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON | IUTF8);
 	raw.c_oflag &= ~(OPOST);
 	raw.c_cflag |= (CS8);
-	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN);
 	raw.c_cc[VMIN] = 1;
 	raw.c_cc[VTIME] = 0;
 	if (tcsetattr(fd, TCSAFLUSH, &raw) < 0)
+	{
+		g_nb_error = ERR_NO_TERM;
 		return (-1);
+	}
 	g_is_raw = 1;
 	return (0);
 }

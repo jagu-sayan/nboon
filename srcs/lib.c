@@ -3,39 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   lib.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/02/26 04:10:42 by jzak              #+#    #+#             */
-/*   Updated: 2014/02/27 18:00:00 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 15:24:09 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 15:24:10 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
-
-size_t			nb_strlen(const char *str)
-{
-	size_t		i;
-
-	i = 0;
-	while (str[i] != '\0')
-		++i;
-	return (i);
-}
-
-char			*nb_strdup(const char *s1)
-{
-	char		*new;
-	char		*save;
-
-	new = (char*)malloc(sizeof(*new) * (nb_strlen(s1) + 1));
-	if (new == NULL)
-		return (NULL);
-	save = new;
-	while (*s1 != '\0')
-		*new++ = *s1++;
-	*new = '\0';
-	return (save);
-}
 
 void			*nb_memmove(void *s1, const void *s2, size_t n)
 {
@@ -57,34 +32,38 @@ void			*nb_memmove(void *s1, const void *s2, size_t n)
 	return (s1);
 }
 
-static size_t	nbr_digit(int n)
+int				nb_atoi(const char *str)
 {
-	int		size;
+	int		result;
+	int		multiply;
 
-	size = 1;
-	while (n)
-	{
-		n /= 10;
-		size++;
-	}
-	return (size);
+	while ((*str > 8 && *str < 14) || (*str == ' '))
+		str++;
+	multiply = 1;
+	if (*str == '-' || *str == '+')
+		multiply = 44 - *str++;
+	result = 0;
+	while (*str >= '0' && *str <= '9')
+		result = (result * 10) + (*str++ - '0');
+	return (result * multiply);
 }
 
 char			*nb_itoa(int n)
 {
 	char	*new;
 	size_t	size;
+	int		tmp;
 
-	size = nbr_digit(n);
+	tmp = n;
+	size = 0;
+	while (++size && tmp)
+		tmp /= 10;
 	if ((new = malloc(size + 1)) == NULL)
 		return (NULL);
 	if (n == 0)
 		*new = '0';
-	else if (n > 0)
-	{
-		n = -n;
+	else if (n > 0 && (n = -n))
 		--size;
-	}
 	else
 		*new = '-';
 	new[size] = '\0';

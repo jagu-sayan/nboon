@@ -1,32 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   move_to_next_word.c                                :+:      :+:    :+:   */
+/*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/26 18:20:28 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/26 18:20:49 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 15:22:36 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 18:10:28 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "internal.h"
+#include "basic.h"
 
-void			move_to_next_word_evt(t_nboon *l)
+int					g_nb_error = -1;
+
+static const char	*g_nb_str_error[] =
 {
-	t_utf8		c;
+	TO_LONG(),
+	NO_TERM()
+};
 
-	c = 32;
-	while (l->b_pos < l->b_len && (c == ' ' || c == '\t'))
-	{
-		c = get_next_char(l->buf, &l->b_pos);
-		l->b_curor += get_display_width(c);
-	}
-	c = 0;
-	while (l->b_pos < l->b_len && (c != ' ' && c != '\t'))
-	{
-		c = get_next_char(l->buf, &l->b_pos);
-		l->b_curor += get_display_width(c);
-	}
-	g_refresh_fn(l);
+const char		*nb_get_error(void)
+{
+	if (g_nb_error < 2)
+		return (g_nb_str_error[g_nb_error]);
+	else
+		return ("");
 }

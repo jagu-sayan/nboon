@@ -1,32 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   move_to_next_word.c                                :+:      :+:    :+:   */
+/*   insert.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/26 18:20:28 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/26 18:20:49 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 15:24:02 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 15:24:03 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "internal.h"
 
-void			move_to_next_word_evt(t_nboon *l)
+void			insert_utf8(t_nboon *l, char *data, int size)
 {
+	t_uint		i;
 	t_utf8		c;
+	t_uint		width;
+	t_uint		pos;
 
-	c = 32;
-	while (l->b_pos < l->b_len && (c == ' ' || c == '\t'))
+	i = 0;
+	c = 1;
+	while (c != 0)
 	{
-		c = get_next_char(l->buf, &l->b_pos);
-		l->b_curor += get_display_width(c);
+		c = get_next_char(data, &i);
+		width = get_display_width(c);
+		l->b_curor += width;
+		l->b_curor_end += width;
 	}
-	c = 0;
-	while (l->b_pos < l->b_len && (c != ' ' && c != '\t'))
+	i = 0;
+	pos = l->b_len - l->b_pos;
+	if (l->b_len != l->b_pos)
+		nb_memmove(&l->buf[l->b_pos + size], &l->buf[l->b_pos], pos);
+	while (data[i] != '\0')
 	{
-		c = get_next_char(l->buf, &l->b_pos);
-		l->b_curor += get_display_width(c);
+		l->buf[l->b_pos++] = data[i++];
+		l->b_len++;
 	}
+	l->buf[l->b_len] = '\0';
 	g_refresh_fn(l);
 }

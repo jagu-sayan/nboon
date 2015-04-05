@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clear_screen.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/14 16:12:08 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/14 16:12:18 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 18:19:37 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 18:19:38 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,5 +16,5 @@
 void			clear_screen_evt(t_nboon *l)
 {
 	nb_clear_screen();
-	refresh_line(l);
+	g_refresh_fn(l);
 }

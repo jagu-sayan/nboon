@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   move_left.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/12 19:14:41 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/12 22:24:42 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 18:20:13 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 18:20:14 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,6 @@ void			move_left_evt(t_nboon *l)
 	if (l->b_pos > 0)
 	{
 		l->b_curor -= get_display_width(get_prev_char(l->buf, &l->b_pos));
-		refresh_line(l);
+		g_refresh_fn(l);
 	}
 }

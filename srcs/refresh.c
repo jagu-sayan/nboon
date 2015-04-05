@@ -3,15 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   refresh.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/13 02:59:30 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/14 19:39:28 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 15:24:43 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 15:24:58 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include "internal.h"
+#include "nboon.h"
+
+t_refresh_fn	g_refresh_fn = nb_refresh_single_line;
+static t_size	g_size;
 
 static void		s_memcpy(char *dest, t_uint *dest_idx, const char *src)
 {
@@ -55,36 +59,64 @@ static void		write_vt100(int fd, const char *str, int nbr1, int nbr2)
 	free(s2);
 }
 
-/* #include <fcntl.h> */
-/* static int	fd = -1; */
-void			refresh_line(t_nboon *l)
+void			nb_refresh_size(int sig)
 {
+	if (ioctl(1, TIOCGWINSZ, &g_size) == -1 || g_size.ws_col == 0)
+		g_size.ws_col = 80;
+	if (sig != 0)
+	{
+		nb_clear_screen();
+		write(STDOUT_FILENO, "\x1b[5n", 4);
+	}
+}
+
+void			nb_refresh_multi_line(t_nboon *l)
+{
+	t_uint	is_end;
 	t_uint	rows;
 	t_uint	cols;
-	t_uint	i;
+	t_uint	pos;
 
-	/* if (fd == -1) */
-	/* 	fd = open("log", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR); */
-	rows = (l->p_len + l->b_curor) / l->cols;
-	cols = (l->p_len + l->b_curor) % l->cols;
-	/* dprintf(fd, "rows  : %d\n", rows); */
-	/* dprintf(fd, "cols  : %d\n", cols); */
-	i = 0;
-	if (i++ < l->rows - rows)
-		write_vt100(l->fd, "B", l->rows - rows, -1);
-	i = 0;
-	while (i++ < rows)
-		write(l->fd, "\x1b[0G\x1b[0K\x1b[1A", 12);
-	write(l->fd, "\x1b[0G\x1b[0K", 8);
+	is_end = (l->p_cursor + l->b_curor_end) % g_size.ws_col;
+	cols = (l->p_cursor + l->b_curor) % g_size.ws_col + 1;
+	rows = (l->p_cursor + l->b_curor_end) / g_size.ws_col;
+	pos = ((l->p_cursor + l->b_curor) / g_size.ws_col);
+	if (l->nbr_rows > 0)
+		write_vt100(l->fd, "A", l->nbr_rows, -1);
+	write(l->fd, "\x1b[0G\x1b[J", 7);
 	write(l->fd, l->prompt, l->p_len);
 	write(l->fd, l->buf, l->b_len);
-	if ((l->b_len + l->p_len) % l->cols == 0)
+	if (rows - pos > 0)
+		write_vt100(l->fd, "A", rows - pos, -1);
+	if (is_end == 0 && l->b_len != 0)
+		write(l->fd, "\x1b[0B", 4);
+	write_vt100(l->fd, "G", cols, -1);
+	l->nbr_rows = pos;
+}
+
+void			nb_refresh_single_line(t_nboon *l)
+{
+	t_uint	cursor;
+	t_uint	end;
+	t_uint	idx;
+	t_uint	len;
+	t_utf8	c;
+
+	cursor = l->b_curor;
+	idx = 0;
+	while (l->p_cursor + cursor >= g_size.ws_col)
+		cursor -= get_display_width(get_next_char(l->buf, &idx));
+	len = 0;
+	end = 0;
+	c = 1;
+	while (c != 0 && end < g_size.ws_col - l->p_cursor - 1)
 	{
-		write(l->fd, "\n", 1);
-		l->rows++;
+		c = get_next_char(l->buf + idx, &len);
+		end += get_display_width(c);
 	}
-	if (l->rows - rows > 0)
-		write_vt100(l->fd, "A", l->rows -rows, -1);
-	write_vt100(l->fd, "G", 0, -1);
-	write_vt100(l->fd, "C", (l->b_curor + l->p_len) % l->cols, -1);
+	write(l->fd, "\x1b[0G", 4);
+	write(l->fd, l->prompt, l->p_len);
+	write(l->fd, l->buf + idx, len);
+	write(l->fd, "\x1b[0K\x1b[0G", 8);
+	write_vt100(l->fd, "G", l->p_cursor + cursor + 1, -1);
 }

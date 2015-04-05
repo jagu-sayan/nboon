@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   history_file.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak </var/mail/jzak>                      +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/01 17:39:44 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/01 18:49:16 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 15:23:54 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 15:31:26 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,21 @@ int				nb_history_save(const char *filename)
 {
 	int		fd;
 	t_uint	i;
-
+	t_uint	idx;
+	t_uint	size;
 
 	if ((fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0660)) == -1)
 		return (-1);
-	i = 0;
-	while (i < g_history_size && g_history[i] != NULL)
+	i = g_history_idx;
+	size = g_history_size + i;
+	while (i < size)
 	{
-		write(fd, g_history[i], nb_strlen(g_history[i]));
-		write(fd, "\n", 1);
+		idx = i % g_history_size;
+		if (g_history[idx] != NULL)
+		{
+			write(fd, g_history[idx], nb_strlen(g_history[idx]));
+			write(fd, "\n", 1);
+		}
 		++i;
 	}
 	close(fd);
@@ -69,4 +75,3 @@ int				nb_history_load(const char *filename)
 	close(fd);
 	return (0);
 }
-

@@ -5,8 +5,8 @@
 #                                                     +:+ +:+         +:+      #
 #    By: jzak </var/mail/jzak>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2014/03/14 20:06:41 by jzak              #+#    #+#              #
-#    Updated: 2014/03/14 20:06:41 by jzak             ###   ########.fr        #
+#    Created: 2014/03/27 18:51:33 by jzak              #+#    #+#              #
+#    Updated: 2014/03/27 18:51:33 by jzak             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ endif
 
 ifeq ($(config),release)
   OBJDIR     = bin/obj/Release/nboon
-  TARGETDIR  = bin
+  TARGETDIR  = .
   TARGET     = $(TARGETDIR)/libnboon.a
   DEFINES   += 
   INCLUDES  += -Iincludes
@@ -54,7 +54,7 @@ endif
 
 ifeq ($(config),debug)
   OBJDIR     = bin/obj/Debug/nboon
-  TARGETDIR  = bin
+  TARGETDIR  = .
   TARGET     = $(TARGETDIR)/libnboon.a
   DEFINES   += 
   INCLUDES  += -Iincludes
@@ -78,13 +78,17 @@ NAME = nboon
 
 OBJECTS := \
 	$(OBJDIR)/completion.o \
+	$(OBJDIR)/error.o \
 	$(OBJDIR)/evt.o \
 	$(OBJDIR)/history.o \
 	$(OBJDIR)/history_file.o \
+	$(OBJDIR)/insert.o \
 	$(OBJDIR)/lib.o \
 	$(OBJDIR)/mode.o \
 	$(OBJDIR)/nboon.o \
+	$(OBJDIR)/prompt.o \
 	$(OBJDIR)/refresh.o \
+	$(OBJDIR)/string.o \
 	$(OBJDIR)/unicode.o \
 	$(OBJDIR)/backspace.o \
 	$(OBJDIR)/clear_end_line.o \
@@ -93,13 +97,13 @@ OBJECTS := \
 	$(OBJDIR)/del_word.o \
 	$(OBJDIR)/delete.o \
 	$(OBJDIR)/history_next.o \
-	$(OBJDIR)/history_prev.o \
 	$(OBJDIR)/move_end.o \
 	$(OBJDIR)/move_home.o \
 	$(OBJDIR)/move_left.o \
 	$(OBJDIR)/move_right.o \
 	$(OBJDIR)/move_to_next_word.o \
 	$(OBJDIR)/move_to_prev_word.o \
+	$(OBJDIR)/paste_line.o \
 	$(OBJDIR)/swap_letter.o \
 
 RESOURCES := \
@@ -166,6 +170,9 @@ endif
 $(OBJDIR)/completion.o: srcs/completion.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/error.o: srcs/error.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/evt.o: srcs/evt.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
@@ -173,6 +180,9 @@ $(OBJDIR)/history.o: srcs/history.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/history_file.o: srcs/history_file.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/insert.o: srcs/insert.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/lib.o: srcs/lib.c
@@ -184,7 +194,13 @@ $(OBJDIR)/mode.o: srcs/mode.c
 $(OBJDIR)/nboon.o: srcs/nboon.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/prompt.o: srcs/prompt.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/refresh.o: srcs/refresh.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/string.o: srcs/string.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/unicode.o: srcs/unicode.c
@@ -211,9 +227,6 @@ $(OBJDIR)/delete.o: srcs/evt/delete.c
 $(OBJDIR)/history_next.o: srcs/evt/history_next.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/history_prev.o: srcs/evt/history_prev.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/move_end.o: srcs/evt/move_end.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
@@ -230,6 +243,9 @@ $(OBJDIR)/move_to_next_word.o: srcs/evt/move_to_next_word.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/move_to_prev_word.o: srcs/evt/move_to_prev_word.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/paste_line.o: srcs/evt/paste_line.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/swap_letter.o: srcs/evt/swap_letter.c

@@ -3,112 +3,98 @@
 /*                                                        :::      ::::::::   */
 /*   nboon.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/02/26 00:53:03 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/14 15:58:47 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 15:24:31 by jzak              #+#    #+#             */
+/*   Updated: 2015/04/03 19:02:48 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
-#include <sys/ioctl.h>
 #include "internal.h"
 #include "nboon.h"
 
-static void		insert_utf8(t_nboon *l, char *data, int size)
+static int		proccess_evt(t_nboon *l, char *c, size_t len)
 {
-	t_uint		i;
-	t_utf8		c;
-
-	i = 0;
-	c = 1;
-	while (c != 0)
+	if (c[0] == CTRL_D)
 	{
-		c = get_next_char(data, &i);
-		l->b_curor += get_display_width(c);
+		if (l->b_len == 0)
+			return (NB_EXIT);
+		delete_evt(l);
 	}
-	i = 0;
-	if (l->b_len != l->b_pos)
-		nb_memmove(&l->buf[l->b_pos + size], &l->buf[l->b_pos], l->b_len - l->b_pos);
-	while (data[i] != '\0')
+	else if (c[0] == ENTER || c[0] == CTRL_J)
+		return (NB_SUCCESS);
+	else if (c[0] == CTRL_C)
+		return (NB_INTERRUPT);
+	else if (c[0] == ESCAPE && c[1] == '[' && c[2] == '0' && c[3] == 'n')
+		g_refresh_fn(l);
+	else if (execute_evt(l, c[0], &c[1]) == 0)
 	{
-		l->buf[l->b_pos] = data[i];
-		l->b_pos++;
-		l->b_len++;
-		++i;
+		if (l->b_len + len < LINE_BUF_SIZE)
+			insert_utf8(l, c, len);
+		else
+		{
+			clear_line_evt(l);
+			g_nb_error = ERR_TO_LONG;
+			return (NB_ERROR);
+		}
 	}
-	l->buf[l->b_len] = '\0';
-	refresh_line(l);
-}
-
-static int		get_columns(void)
-{
-	struct winsize		ws;
-
-	if (ioctl(1, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0)
-		return (80);
-	return (ws.ws_col);
+	return (250);
 }
 
 static int		line_edit(t_nboon *l)
 {
-	char	c[LINE_BUF_SIZE] = { 0 };
-	int		ret;
+	static char		buf[LINE_BUF_SIZE] = { 0 };
+	int				ret;
 
 	write(l->fd, l->prompt, l->p_len);
-	while ((ret = read(l->fd, &c, LINE_BUF_SIZE)) > 0)
+	while ((ret = read(l->fd, &buf, LINE_BUF_SIZE)) > 0 && g_nb_error == -1)
 	{
-		c[ret] = '\0';
-		if (c[0] == CTRL_D)
-		{
-			if (l->b_len == 0)
-				return (-1);
-			delete_evt(l);
-		}
-		else if (c[0] == CTRL_C || c[0] == ENTER || c[0] == CTRL_J)
-			return (0);
-		else if (execute_evt(l, c[0], &c[1]) == 0)
-		{
-			if (l->b_len + ret < LINE_BUF_SIZE)
-				insert_utf8(l, c, ret);
-			else
-				return (-1);
-		}
+		buf[ret] = '\0';
+		ret = proccess_evt(l, buf, ret);
+		if (ret != 250)
+			return (ret);
 	}
-	return (0);
+	return (NB_SUCCESS);
 }
 
-/*
-** The call to get_line() will block as long as the user types something
-** and presses enter.
-**
-** The typed string is returned as a malloc() allocated string,
-** so the user needs to free() it.
-**/
-char			*nb_get_line(const char *prompt)
+void			nb_set_refresh_callback(t_refresh_fn fn)
 {
-	t_nboon		line;
-	int			count;
+	g_refresh_fn = fn;
+}
 
-	line.fd = STDIN_FILENO;
-	line.buf[0] = '\0';
-	line.b_len = 0;
-	line.b_pos = 0;
-	line.b_curor = 0;
-	line.prompt = prompt;
-	line.p_len = nb_strlen(prompt);
-	line.cols = get_columns();
-	line.rows = 0;
-	count = -1;
-	if (isatty(STDIN_FILENO) && nb_enable_raw(STDIN_FILENO) != -1)
-	{
-		count = line_edit(&line);
-		nb_disable_raw(STDIN_FILENO);
-		write(1, "\n", 1);
-		if (count == -1)
-			return (NULL);
-	}
-	else
-		return (NULL);
-	return (nb_strdup(line.buf));
+static void		init_line(t_nboon *l)
+{
+	l->fd = STDIN_FILENO;
+	l->buf[0] = '\0';
+	l->paste_line = NULL;
+	l->save_line = NULL;
+	l->b_len = 0;
+	l->b_pos = 0;
+	l->b_curor = 0;
+	l->b_curor_end = 0;
+}
+
+t_nb_status		nb_get_line(const char *prompt, char **line)
+{
+	t_nboon		l;
+	int			ret;
+
+	if (nb_enable_raw(STDIN_FILENO) == -1)
+		return (NB_ERROR);
+	init_line(&l);
+	l.p_cursor = get_str_display_width(prompt);
+	l.p_len = expand_prompt(prompt, &l.prompt);
+	l.nbr_rows = 0;
+	nb_refresh_size(0);
+	/* free(*line); */
+	/* *line = NULL; */
+	ret = line_edit(&l);
+	nb_disable_raw(l.fd);
+	free(l.prompt);
+	free(l.paste_line);
+	free(l.save_line);
+	write(l.fd, "\n", 1);
+	*line = ((ret != NB_EXIT) ? nb_strdup(l.buf) : NULL);
+	return (ret);
 }

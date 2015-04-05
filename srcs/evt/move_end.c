@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   move_end.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/14 16:00:30 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/14 16:02:06 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 18:19:59 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 18:20:01 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void			move_end_evt(t_nboon *l)
 {
-	while (l->b_pos < l->b_len)
-		l->b_curor += get_display_width(get_next_char(l->buf, &l->b_pos));
-	refresh_line(l);
+	l->b_curor = l->b_curor_end;
+	l->b_pos = l->b_len;
+	g_refresh_fn(l);
 }

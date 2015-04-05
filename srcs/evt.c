@@ -3,31 +3,33 @@
 /*                                                        :::      ::::::::   */
 /*   evt.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/12 18:49:10 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/14 19:36:58 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 15:22:54 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 18:18:20 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "internal.h"
 
-static t_nbevent	g_evt_fn[]= {
-		{ BACKSPACE, backspace_evt },
-		{ CTRL_H, backspace_evt },
-		{ CTRL_B, move_left_evt },
-		{ CTRL_F, move_right_evt },
-		{ CTRL_A, move_home_evt },
-		{ CTRL_E, move_end_evt },
-		{ CTRL_L, clear_screen_evt },
-		{ CTRL_U, clear_line_evt },
-		{ CTRL_K, clear_end_line_evt },
-		{ CTRL_P, history_prev_evt },
-		{ CTRL_N, history_next_evt },
-		{ CTRL_W, del_word_evt },
-		{ CTRL_T, swap_letter_evt },
-		{ HT_TAB, tab_evt },
-		{ -1, NULL }
+static t_nbevent	g_evt_fn[] = {
+	{ BACKSPACE, backspace_evt },
+	{ CTRL_H, backspace_evt },
+	{ CTRL_B, move_left_evt },
+	{ CTRL_F, move_right_evt },
+	{ CTRL_A, move_home_evt },
+	{ CTRL_E, move_end_evt },
+	{ CTRL_L, clear_screen_evt },
+	{ CTRL_U, clear_line_evt },
+	{ CTRL_K, clear_end_line_evt },
+	{ CTRL_P, NULL },
+	{ CTRL_N, NULL },
+	{ CTRL_Y, paste_line_evt },
+	{ CTRL_W, del_word_evt },
+	{ CTRL_Q, del_path_evt },
+	{ CTRL_T, swap_letter_evt },
+	{ HT_TAB, tab_evt },
+	{ -1, NULL }
 };
 
 static void		escape_extended(t_nboon *l, char evt, char *key)
@@ -55,9 +57,9 @@ static int		escape_evt(t_nboon *l, char *key)
 		else if (key[1] == RIGHT_KEY)
 			move_right_evt(l);
 		else if (key[1] == UP_KEY)
-			history_prev_evt(l);
+			history_next_evt(l, NB_HISTORY_PREV);
 		else if (key[1] == DOWN_KEY)
-			history_next_evt(l);
+			history_next_evt(l, NB_HISTORY_NEXT);
 		else if (key[1] == HOME_KEY)
 			move_home_evt(l);
 		else if (key[1] == END_KEY)
@@ -75,9 +77,6 @@ static int		escape_evt(t_nboon *l, char *key)
 	return (1);
 }
 
-/*
-** errno = ENOTTY;
-*/
 int				execute_evt(t_nboon *l, int evt, char *key)
 {
 	int					i;
@@ -89,12 +88,17 @@ int				execute_evt(t_nboon *l, int evt, char *key)
 	{
 		if (g_evt_fn[i].evt == evt)
 		{
-			g_evt_fn[i].fn(l);
+			if (evt == CTRL_P)
+				history_next_evt(l, NB_HISTORY_PREV);
+			else if (evt == CTRL_N)
+				history_next_evt(l, NB_HISTORY_NEXT);
+			else
+				g_evt_fn[i].fn(l);
 			return (1);
 		}
 		++i;
 	}
-	if (evt <= ESCAPE)
+	if (key[0] == '\0' && evt <= 31)
 		return (1);
 	return (0);
 }

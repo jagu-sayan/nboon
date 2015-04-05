@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   move_to_prev_word.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/14 19:01:40 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/14 19:19:20 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 18:20:34 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 18:20:49 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,5 @@ void			move_to_prev_word_evt(t_nboon *l)
 		c = get_prev_char(l->buf, &l->b_pos);
 		l->b_curor -= get_display_width(c);
 	}
-	refresh_line(l);
+	g_refresh_fn(l);
 }

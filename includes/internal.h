@@ -3,22 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   internal.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/14 16:28:27 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/14 19:36:36 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 18:34:19 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 18:37:49 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef INTERNAL_H
 # define INTERNAL_H
-# include <stdlib.h>
+# include <sys/ioctl.h>
+# include "basic.h"
 
-# define LINE_BUF_SIZE  4096
-# define WRITE_BUF_SIZE 32
-# define HISTORY_SIZE   0
-
-typedef enum			e_key_evt
+typedef enum		e_key_evt
 {
 	CTRL_A = 1,
 	CTRL_B = 2,
@@ -34,7 +31,7 @@ typedef enum			e_key_evt
 	CTRL_K = 11,
 	CTRL_L = 12,
 	CTRL_M = 13,
-	ENTER  = 13,
+	ENTER = 13,
 	CTRL_N = 14,
 	CTRL_O = 15,
 	CTRL_P = 16,
@@ -50,113 +47,104 @@ typedef enum			e_key_evt
 	CTRL_Z = 26,
 	ESCAPE = 27,
 	BACKSPACE = 127
-}						t_key_evt;
+}					t_key_evt;
 
-typedef enum			e_escape_evt
+typedef enum		e_escape_evt
 {
-	SHIFT_KEY  = '2',
-	CTRL_KEY   = '5',
-	UP_KEY     = 'A',
-	DOWN_KEY   = 'B',
-	RIGHT_KEY  = 'C',
-	LEFT_KEY   = 'D',
-	HOME_KEY   = 'H',
-	END_KEY    = 'F',
+	SHIFT_KEY = '2',
+	CTRL_KEY = '5',
+	UP_KEY = 'A',
+	DOWN_KEY = 'B',
+	RIGHT_KEY = 'C',
+	LEFT_KEY = 'D',
+	HOME_KEY = 'H',
+	END_KEY = 'F',
 	DELETE_KEY = '~'
-}						t_escpae_evt;
+}					t_escpae_evt;
+
+typedef enum		e_nb_history
+{
+	NB_HISTORY_NEXT = 1,
+	NB_HISTORY_PREV = 2
+}					t_nb_history;
 
 /*
-** Basic type
+** Function callback
 */
-typedef unsigned int	t_uint;
-typedef unsigned int	t_utf8;
+typedef void(*t_nbevent_fn)(t_nboon*);
 
-/*
-** Global (history.c)
-*/
-extern char				**g_history;
-extern size_t			g_history_size;
-extern t_uint			g_history_idx;
+typedef struct		s_nbevent
+{
+	int				evt;
+	t_nbevent_fn	fn;
+}					t_nbevent;
 
 /*
 ** Interval structure for binary search
 */
-typedef struct			s_interval
+typedef struct		s_interval
 {
-	t_utf8				first;
-	t_utf8				last;
-}						t_interval;
+	t_utf8			first;
+	t_utf8			last;
+}					t_interval;
 
 /*
-** The s_nboon structure represents the state during line editing.
-** We pass this state to functions implementing specific editing
-** functionalities.
+** Utility function (string.c lib.c)
 */
-typedef struct			s_nboon
-{
-	int					fd;
-	char				buf[LINE_BUF_SIZE];
-	t_uint				b_len;
-	t_uint				b_pos;
-	t_uint				b_curor;
-	const char *		prompt;
-	t_uint				p_len;
-	t_uint				cols;
-	t_uint				rows;
-	t_uint				history_index;
-}						t_nboon;
-
-typedef void(*t_nbevent_fn)(t_nboon*);
-
-typedef struct			s_nbevent
-{
-	int					evt;
-	t_nbevent_fn		fn;
-}						t_nbevent;
+size_t				nb_strlen(const char *str);
+char				*nb_strncpy(char *s1, const char *s2, size_t n);
+char				*nb_strdup(const char *s1);
+int					nb_strcmp(const char *s1, const char *s2);
+void				*nb_memmove(void *s1, const void *s2, size_t n);
+int					nb_atoi(const char *str);
+char				*nb_itoa(int n);
 
 /*
-** Utility function (lib.c)
+** insert data in nboon buffer (insert.c)
 */
-size_t			nb_strlen(const char *str);
-char			*nb_strdup(const char *s1);
-void			*nb_memmove(void *s1, const void *s2, size_t n);
-char			*nb_itoa(int n);
-
-/*
-** Core function (refresh.c)
-*/
-void			refresh_line(t_nboon *l);
+void				insert_utf8(t_nboon *l, char *data, int size);
 
 /*
 ** Event function (in evt folder and evt.c)
 */
-int				execute_evt(t_nboon *l, int evt, char *key);
-void			backspace_evt(t_nboon *l);
-void			delete_evt(t_nboon *l);
-void			move_right_evt(t_nboon *l);
-void			move_left_evt(t_nboon *l);
-void			move_home_evt(t_nboon *l);
-void			move_end_evt(t_nboon *l);
-void			move_to_next_word_evt(t_nboon *l);
-void			move_to_prev_word_evt(t_nboon *l);
-void			clear_screen_evt(t_nboon *l);
-void			clear_line_evt(t_nboon *l);
-void			clear_end_line_evt(t_nboon *l);
-void			history_prev_evt(t_nboon *l);
-void			history_next_evt(t_nboon *l);
-void			del_word_evt(t_nboon *l);
-void			swap_letter_evt(t_nboon *l);
+int					execute_evt(t_nboon *l, int evt, char *key);
+void				backspace_evt(t_nboon *l);
+void				delete_evt(t_nboon *l);
+void				move_right_evt(t_nboon *l);
+void				move_left_evt(t_nboon *l);
+void				move_home_evt(t_nboon *l);
+void				move_end_evt(t_nboon *l);
+void				move_to_next_word_evt(t_nboon *l);
+void				move_to_prev_word_evt(t_nboon *l);
+void				clear_screen_evt(t_nboon *l);
+void				clear_line_evt(t_nboon *l);
+void				clear_end_line_evt(t_nboon *l);
+void				history_next_evt(t_nboon *l, int cmd);
+void				del_word_evt(t_nboon *l);
+void				del_path_evt(t_nboon *l);
+void				swap_letter_evt(t_nboon *l);
+void				paste_line_evt(t_nboon *l);
 
 /*
 ** Tab completion evt (completion.c)
 */
-void			tab_evt(t_nboon *l);
+void				tab_evt(t_nboon *l);
 
 /*
-** unicode.c
+** unicode.c (utf8)
 */
-int				get_display_width(t_utf8 c);
-t_utf8			get_next_char(const char *s, t_uint *idx);
-t_utf8			get_prev_char(const char *s, t_uint *idx);
+int					get_display_width(t_utf8 c);
+size_t				get_str_display_width(const char *str);
 
-#endif /* INTERNAL_H */
+/*
+** return 0 if the end or begin of the string is reached.
+*/
+t_utf8				get_next_char(const char *s, t_uint *idx);
+t_utf8				get_prev_char(const char *s, t_uint *idx);
+
+/*
+** prompt.c
+*/
+t_uint				expand_prompt(const char *prompt, char **ret);
+
+#endif

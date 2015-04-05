@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jzak <jagu.sayan@gmail.com>                +#+  +:+       +#+        */
+/*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/02/26 04:03:09 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/14 19:09:48 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/27 21:36:31 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/27 21:36:46 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,26 +15,25 @@
 #include <string.h>
 #include "nboon.h"
 
-#define HISTORY_FILE "history.txt"
 int		main(void)
 {
 	char	*line;
-	
-	//nb_set_completion_callback(completion);
+	int		ret;
+
 	nb_history_init(4);
-	nb_history_load(HISTORY_FILE);
-	while((line = nb_get_line("hello> ")) != NULL)
+	nb_history_load("history.txt");
+	while ((ret = nb_get_line("hello> ", &line)) != NB_EXIT)
 	{
-		/* Do something with the string. */
-		if (line[0] != '\0' && line[0] != '/')
+		if (ret == NB_ERROR)
+			dprintf(2, "%s\n", nb_get_error());
+		else if (ret != NB_INTERRUPT && line[0] != '\0' && line[0] != '/')
 		{
 			printf("echo: '%s'\n", line);
 			nb_history_add(line);
-			//parse_shell();
 		}
 		free(line);
 	}
-	nb_history_save(HISTORY_FILE);
+	nb_history_save("history.txt");
 	nb_history_free();
 	return (0);
 }

@@ -1,32 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   move_to_next_word.c                                :+:      :+:    :+:   */
+/*   prompt.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jzak <jzak@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/03/26 18:20:28 by jzak              #+#    #+#             */
-/*   Updated: 2014/03/26 18:20:49 by jzak             ###   ########.fr       */
+/*   Created: 2014/03/26 15:24:37 by jzak              #+#    #+#             */
+/*   Updated: 2014/03/26 15:24:58 by jzak             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdlib.h>
 #include "internal.h"
 
-void			move_to_next_word_evt(t_nboon *l)
+t_uint			expand_prompt(const char *prompt, char **ret)
 {
-	t_utf8		c;
+	t_uint		size;
+	t_uint		i;
+	char		*new;
 
-	c = 32;
-	while (l->b_pos < l->b_len && (c == ' ' || c == '\t'))
+	i = 0;
+	size = nb_strlen(prompt);
+	if ((new = (char*)malloc(sizeof(*new) * (size + 1))) == NULL)
+		return (0);
+	while (*prompt)
 	{
-		c = get_next_char(l->buf, &l->b_pos);
-		l->b_curor += get_display_width(c);
+		if (*prompt != 1 && *prompt != 2)
+			new[i++] = *prompt;
+		++prompt;
 	}
-	c = 0;
-	while (l->b_pos < l->b_len && (c != ' ' && c != '\t'))
-	{
-		c = get_next_char(l->buf, &l->b_pos);
-		l->b_curor += get_display_width(c);
-	}
-	g_refresh_fn(l);
+	new[i] = '\0';
+	*ret = new;
+	return (i);
 }
